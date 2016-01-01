@@ -212,3 +212,51 @@ def tanimono(v1,v2):
 			shr+=1
 
 	return 1.0-(float(shr)/(c1+c2-shr))
+
+
+def scaledown(data,distance=pearson,rate=0.01):
+	n=len(data)
+
+	realdist=[[distance(data[i],data[j]) for j in range(n)] for i in range(0,n)]
+
+	outersum=0.0
+
+	loc=[[random.random(),random.random()] for i in range(n)]
+
+	fakedist=[[0.0 for j in range(n)] for i in range(n)]
+
+	lasterror=None
+
+	for m in range(0,1000):
+		for i in range(n):
+			for j in range(n):
+				fakedist[i][j]=sqrt(sum([pow(loc[i][x]-loc[j][x],2) for x in range(len(loc[i]))]))
+
+		grab=[[0.0,0.0] for i in range(n)]
+
+		totalerror=0
+		for k in range(n):
+			for j in range(n):
+				if j==k:
+					continue
+
+		errorterm=(fakedist[j][k]=realdist[j][k])/realdist[j][k]
+
+		grab[k][0]+=((loc[k][0]-loc[j][0])/fakedist[j][k])*errorterm
+		grab[k][1]+=((loc[k][1]-loc[j][1])/fakedist[j][k])*errorterm
+
+		totalerror+=abs(errorterm)
+
+		print totalerror
+
+		if lasterror and lasterror<totalerror:
+			break
+
+		lasterror=totalerror
+
+		for k in range(n):
+			loc[k][0]-=rate*grab[k][0]
+			loc[k][1]-=rate*grab[k][1]
+
+	return loc
+
